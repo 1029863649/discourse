@@ -11,10 +11,25 @@
 
 body.login-page,
 body.signup-page,
-body.invite-page {
-  & ~ .powered-by-discourse,
+body.invite-page,
+body.password-reset-page {
+  .powered-by-discourse,
   .above-main-container-outlet {
     display: none;
+  }
+  #main-outlet {
+    padding: 0;
+  }
+  .d-header {
+    box-shadow: none;
+    border: none;
+    background-color: var(--secondary);
+  }
+  .d-header .home-logo-wrapper-outlet {
+    width: 100%;
+  }
+  .d-header .title a {
+    margin: 0 auto;
   }
 }
 
@@ -25,7 +40,8 @@ body.signup-page {
 
 .login-fullpage,
 .signup-fullpage,
-.invites-show {
+.invites-show,
+.password-reset-page {
   .signup-body,
   .login-body {
     display: flex;
@@ -49,6 +65,7 @@ body.signup-page {
 
     &__existing-account,
     &__no-account-yet {
+      font-size: var(--font-down-1);
       color: var(--primary-medium);
     }
 
@@ -70,17 +87,6 @@ body.signup-page {
   .login-right-side {
     padding: 3rem;
     position: relative;
-
-    &::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 50%;
-      width: 1px;
-      height: 80%;
-      transform: translateY(-50%);
-      background-color: var(--primary-low);
-    }
   }
 
   .input-group {
@@ -109,7 +115,6 @@ body.signup-page {
 
     span.more-info {
       color: var(--primary-medium);
-      min-height: 1.4em; // prevents height increase due to tips
       overflow-wrap: anywhere;
     }
 
@@ -118,14 +123,13 @@ body.signup-page {
     .user-field.dropdown label.control-label,
     .user-field.multiselect label.control-label {
       color: var(--primary-medium);
-      font-size: 16px;
       font-weight: normal;
       position: absolute;
       pointer-events: none;
       left: 1em;
       top: 13px;
       box-shadow: 0 0 0 0px rgba(var(--tertiary-rgb), 0);
-      transition: 0.2s ease all;
+      transition: 0.25s ease all;
     }
 
     .user-field.text label.control-label,
@@ -156,6 +160,28 @@ body.signup-page {
       font-size: var(--font-down-1);
     }
 
+    .more-info {
+      opacity: 0;
+      max-height: 0;
+      transition: opacity 0.25s, max-height 0.25s;
+    }
+
+    input:focus + label + span.more-info {
+      opacity: 1;
+      max-height: 50px;
+    }
+
+    .instructions {
+      opacity: 0;
+      max-height: 0;
+      transition: opacity 0.25s, max-height 0.25s;
+    }
+
+    input:focus + label + .tip + .instructions {
+      opacity: 1;
+      max-height: 50px;
+    }
+
     input.alt-placeholder:invalid {
       color: var(--primary);
     }
@@ -168,11 +194,13 @@ body.signup-page {
     }
 
     #email-login-link {
-      transition: opacity 0.5s;
+      transition: opacity 0.25s, max-height 0.25s;
+      max-height: 50px; // arbitrary number, but allows for smooth transition
 
       &.no-login-filled {
         opacity: 0;
         visibility: hidden;
+        max-height: 0;
       }
     }
 
@@ -207,6 +235,7 @@ body.signup-page {
 
     .btn-social {
       border: 1px solid var(--primary-low);
+      padding: 0.75em 0.77em; // matches input padding
     }
   }
 
@@ -220,10 +249,17 @@ body.signup-page {
 
   .tip {
     font-size: var(--font-down-1);
-    min-height: 1.4em;
+    max-height: 0;
+    opacity: 0;
     display: block;
+    transition: opacity 0.25s, max-height 0.25s;
     &.bad {
       color: var(--danger);
+    }
+    &.good,
+    &.bad {
+      max-height: 50px;
+      opacity: 1;
     }
   }
 
@@ -250,6 +286,13 @@ body.signup-page {
     justify-content: space-between;
     .create-account__password-tip-validation {
       display: flex;
+      max-height: 0;
+      opacity: 0;
+      transition: opacity 0.25s, max-height 0.25s;
+      &.validation-shown {
+        max-height: 50px;
+        opacity: 1;
+      }
     }
   }
 

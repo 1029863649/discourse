@@ -36,13 +36,6 @@
               @outletArgs={{hash createAccount=this.createAccount}}
             />
           </WelcomeHeader>
-          {{#if this.showLoginButtons}}
-            <LoginButtons
-              @externalLogin={{this.externalLoginAction}}
-              @passkeyLogin={{this.passkeyLogin}}
-              @context="login"
-            />
-          {{/if}}
         {{/if}}
 
         {{#if this.canLoginLocal}}
@@ -77,6 +70,16 @@
               @flashTypeChanged={{this.flashTypeChanged}}
               @securityKeyCredentialChanged={{this.securityKeyCredentialChanged}}
             />
+            {{#if (and this.site.mobileView this.showLoginButtons)}}
+              <div class="login-or-separator"><span>
+                  {{i18n "login.or"}}</span></div>
+              <div class="login-right-side">
+                <LoginButtons
+                  @externalLogin={{this.externalLoginAction}}
+                  @passkeyLogin={{this.passkeyLogin}}
+                  @context="login"
+                /></div>
+            {{/if}}
             {{#if this.site.desktopView}}
               <LoginPageCta
                 @canLoginLocal={{this.canLoginLocal}}
