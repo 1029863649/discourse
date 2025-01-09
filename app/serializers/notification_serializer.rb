@@ -53,6 +53,6 @@ class NotificationSerializer < ApplicationSerializer
   end
 
   def include_acting_user_avatar_template?
-    object.acting_user.present?
+    SiteSetting.show_user_menu_avatars
   end
 end

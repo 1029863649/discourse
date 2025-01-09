@@ -289,3 +289,4 @@ end
 gem "dry-initializer", "~> 3.1"
 
 gem "parallel"
+gem "goldiloader"
