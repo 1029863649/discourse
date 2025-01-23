@@ -57,6 +57,10 @@
   align-items: center;
 }
 
+.composer-open-no-preview .sidebar-wrapper .sidebar-container {
+  height: 100%;
+}
+
 .sidebar-wrapper {
   display: flex;
   grid-area: sidebar;
