@@ -1,16 +1,31 @@
+import { getOwner } from "@ember/owner";
 import { hbs } from "ember-cli-htmlbars";
 import $ from "jquery";
 import { h } from "virtual-dom";
 import { addWidgetCleanCallback } from "discourse/components/mount-widget";
 import discourseDebounce from "discourse/lib/debounce";
+import { registerDeprecationHandler } from "discourse/lib/deprecated";
 import { iconNode } from "discourse/lib/icon-library";
 import { Placeholder } from "discourse/lib/posts-with-placeholders";
+import { consolePrefix } from "discourse/lib/source-identifier";
 import transformPost from "discourse/lib/transform-post";
 import DiscourseURL from "discourse/lib/url";
 import { avatarFor } from "discourse/widgets/post";
 import RenderGlimmer from "discourse/widgets/render-glimmer";
 import { createWidget } from "discourse/widgets/widget";
 import { i18n } from "discourse-i18n";
+
+export let havePostStreamWidgetExtensions = null;
+
+registerDeprecationHandler((_, opts) => {
+  if (opts?.id === "discourse.post-stream-widget-overrides") {
+    if (!havePostStreamWidgetExtensions) {
+      havePostStreamWidgetExtensions = new Set();
+    }
+
+    havePostStreamWidgetExtensions.add(consolePrefix().slice(1, -1));
+  }
+});
 
 let transformCallbacks = null;
 
@@ -194,6 +209,8 @@ export default createWidget("post-stream", {
   tagName: "div.post-stream",
 
   html(attrs) {
+    getOwner(this).lookup("service:site").useGlimmerPostStream;
+
     const posts = attrs.posts || [];
     const postArray = posts.toArray();
     const postArrayLength = postArray.length;
@@ -285,7 +302,38 @@ export default createWidget("post-stream", {
         // The following properties will have to be untangled from the transformed model when
         // converting this widget to a Glimmer component:
         // canCreatePost, showReadIndicator, prevPost, nextPost
-        result.push(this.attach("post", transformed, { model: post }));
+        // result.push(this.attach("post", transformed, { model: post }));
+        result.push(
+          this.attach("glimmer-post", {
+            post,
+            prevPost,
+            nextPost,
+            canCreatePost: attrs.canCreatePost, //ok
+            changeNotice: () => this.sendWidgetAction("changeNotice", post),
+            changePostOwner: () =>
+              this.sendWidgetAction("changePostOwner", post),
+            deletePost: () => this.sendWidgetAction("deletePost", post),
+            editPost: () => this.sendWidgetAction("editPost", post),
+            grantBadge: () => this.sendWidgetAction("grantBadge", post),
+            lockPost: () => this.sendWidgetAction("lockPost", post),
+            permanentlyDeletePost: () =>
+              this.sendWidgetAction("permanentlyDeletePost", post),
+            rebakePost: () => this.sendWidgetAction("rebakePost", post),
+            recoverPost: () => this.sendWidgetAction("recoverPost", post),
+            replyToPost: () => this.sendWidgetAction("replyToPost", post),
+            showFlags: () => this.sendWidgetAction("showFlags", post),
+            showHistory: () => this.sendWidgetAction("showHistory", post),
+            showLogin: () => this.sendWidgetAction("showLogin", post),
+            showInvite: () => this.sendWidgetAction("showInvite", post),
+            showPagePublish: () =>
+              this.sendWidgetAction("showPagePublish", post),
+            showReadIndicator: attrs.showReadIndicator,
+            togglePostType: () => this.sendWidgetAction("togglePostType", post),
+            toggleWiki: () => this.sendWidgetAction("toggleWiki", post),
+            unhidePost: () => this.sendWidgetAction("unhidePost", post),
+            unlockPost: () => this.sendWidgetAction("unlockPost", post),
+          })
+        );
       }
 
       // Post gap - after
